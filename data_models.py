@@ -9,6 +9,13 @@ class Author(db.Model):
     birth_date = db.Column(db.Date)
     date_of_death = db.Column(db.Date)
 
+    books = db.relationship(
+                            'Book',
+                            back_populates='author',
+                            cascade='all, delete-orphan',
+                            passive_deletes=True
+    )
+
 
     def __str__(self):
         output = f'Name: {self.name}, Birth Date: {self.birth_date}'
@@ -21,7 +28,10 @@ class Book(db.Model):
     isbn = db.Column(db.String(13))
     title = db.Column(db.String(100))
     publication_year = db.Column(db.Integer)
-    author_id = db.Column(db.Integer, db.ForeignKey('authors.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('authors.id', ondelete='CASCADE'), nullable=False)
+    rating = db.Column(db.Float, default=0.0)
+
+    author = db.relationship('Author', back_populates='books')
 
     def __str__(self):
         output = f'Title: {self.title}, Year: {self.year}'

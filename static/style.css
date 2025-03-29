@@ -67,15 +67,16 @@ input, select {
     border-radius: 5px;
     border: 1px solid #ccc;
 }
-input[type="submit"], .delete-btn {
+input[type="submit"], .delete-btn, button {
     background: #e74c3c;
     color: white;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
     transition: 0.3s;
+    border-radius: 5px;
 }
-input[type="submit"]:hover, .delete-btn:hover {
+input[type="submit"]:hover, .delete-btn:hover, button:hover {
     background: #c0392b;
 }
 
@@ -94,16 +95,26 @@ input[type="submit"]:hover, .delete-btn:hover {
 }
 
 /* Book Cards */
-.book-card {
+.book-card, .book-card2 {
     background: white;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: 0.3s;
 }
+.book-card2 {
+    margin: 0 auto;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 70%
+}
 .book-card:hover {
     transform: scale(1.05);
 }
+
 .book-card h3 {
     font-size: 1.2rem;
     color: #2c3e50;
@@ -131,6 +142,10 @@ input[type="submit"]:hover, .delete-btn:hover {
 .author-link:hover {
     color: black;
     transition: 0.2s;
+}
+img:hover {
+    transform: rotate(2160deg);
+    transition: 1.6s;
 }
 
 /* Error Messages */

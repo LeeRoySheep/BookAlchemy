@@ -15,6 +15,7 @@
             <ul class="nav-links">
                 <li><a href="/add_author">➕ Add Author</a></li>
                 <li><a href="/add_book">📖 Add Book</a></li>
+                <li><a href="/get_ai_recommendation">🤖 AI Recommendation</a></li>
             </ul>
             <div class="actions">
                 <form action="/" method="POST">
@@ -23,6 +24,7 @@
                         <option value="title">Title</option>
                         <option value="author">Author</option>
                         <option value="year">Year</option>
+                        <option value="rating">Rating</option>
                     </select>
                     <label for="descending">Descending:</label>
                     <input type="checkbox" id="descending" name="descending" value="descending">
@@ -41,7 +43,15 @@
         <section class="books">
             {% if error %}
                 <h2 class="error">⚠️ No Books Found!</h2>
+            {% elif success %}
+                <h2 class="success">✅ Book added successfully!</h2>
+            {% elif success == False %}
+                <h2 class="error">❌ Failed to add book!</h2>
             {% endif %}
+            {% if rated %}
+                <h2 class="success">✅ Book rated successfully!</h2>
+            {% endif %}
+
             {% if deleted %}
                 <h2 class="success">✅ Book deleted successfully!</h2>
             {% elif deleted == False %}
@@ -66,6 +76,13 @@
                         <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="Book Cover">
                       </a>
                     {% endif %}
+                    <footer>
+                        <form action="/book/rating/{{ book.id }}" method="POST">
+                            <label for="rating">Rating:</label>
+                            <input type="number" id="rating" name="rating" step="0.1" min="0.0" max="10.0" value="{{ book.rating }}" required>
+                            <input type="submit" value="Rate">
+                        </form>
+                    </footer>
                     <form action="/book/{{ book.id }}/delete" method="POST">
                         <button class="delete-btn">🗑 Delete Book</button>
                     </form>

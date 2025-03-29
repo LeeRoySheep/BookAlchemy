@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recomendation['book']['title'] }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <header class="title-container">
+        <h1>🤖 AI Recomendation: <strong>{{ recomendation['book']['title'] }} </strong></h1>
+        <h2>📖  Written by: <strong>{{ recomendation['book']['author'] }}</strong></h2>
+        <nav>
+            <form action="/add_recommendation" method="POST">
+                <input type="hidden" name="isbn" value="{{ recomendation['book']['isbn'] }}">
+                <input type="hidden" name="title" value="{{ recomendation['book']['title'] }}">
+                <input type="hidden" name="author" value="{{ recomendation['book']['author'] }}">
+                <input type="hidden" name="year" value="{{ recomendation['book']['year'] }}">
+                <input type="hidden" name="birthday" value="{{ recomendation['book']['birthday'] }}">
+                {% if recomendation['book']['died'] %}
+                <input type="hidden" name="died" value="{{ recomendation['book']['died'] }}">
+                {% endif %}
+                <button type="submit" class="btn btn-primary">✨ Add to My Library</button>
+            </form>
+            <a href="/get_ai_recommendation" class="btn btn-primary"><button>🔄 New Recomendation</button></a>
+        </nav>
+    </header>
+    <section class="book-card2">
+        <p class="details">🗓 Published: {{ recomendation['book']['year'] }}</p>
+        <p class="details">📚 ISBN: {{ recomendation['book']['isbn'] }}</p>
+          <a href="https://openlibrary.org/isbn/{{ recomendation['book']['isbn'] }}" target="_blank">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ recomendation['book']['isbn'] }}-M.jpg" class="cover" alt="Book Cover">
+          </a><br>
+        <div class="description">Reasoning: {{ recomendation['reasoning'] }} </div>    <br>
+
+    <footer class="botton-container">
+        <a href="/" class="btn btn-secondary btn-back"><button>⬅ Back to Home</button></a>
+    </footer>
+    </section>
+
+</body>
+</html>
