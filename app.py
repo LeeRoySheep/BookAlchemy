@@ -343,7 +343,7 @@ def get_ai_recommendation():
     return render_template("ai_recomendation.html",
                            recomendation=ai_request.ai_request(dataset))
 
-app.run(debug=True)
+app.run(host="0.0.0.0", port=5002,debug=True)
 
 # Only needed to create datatables at the beginning of the project
 # with app.app_context():
