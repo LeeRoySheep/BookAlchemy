@@ -9,6 +9,7 @@ class Author(db.Model):
     birth_date = db.Column(db.Date)
     date_of_death = db.Column(db.Date)
 
+
     def __str__(self):
         output = f'Name: {self.name}, Birth Date: {self.birth_date}'
         return output

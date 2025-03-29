@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Online Library</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>📚 My Online Library</h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/add_author">➕ Add Author</a></li>
+                <li><a href="/add_book">📖 Add Book</a></li>
+            </ul>
+            <div class="actions">
+                <form action="/" method="POST">
+                    <label for="options">Sort by:</label>
+                    <select id="options" name="options">
+                        <option value="title">Title</option>
+                        <option value="author">Author</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <label for="descending">Descending:</label>
+                    <input type="checkbox" id="descending" name="descending" value="descending">
+                    <input type="submit" value="Sort">
+                </form>
+
+                <form class="search" action="/search" method="POST">
+                    <input type="text" id="search" name="search" placeholder="🔍 Search books...">
+                    <input type="submit" value="Search">
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="books">
+            {% if error %}
+                <h2 class="error">⚠️ No Books Found!</h2>
+            {% endif %}
+            {% if deleted %}
+                <h2 class="success">✅ Book deleted successfully!</h2>
+            {% elif deleted == False %}
+                <h2 class="error">❌ Failed to delete book!</h2>
+            % if auth_deleted %}
+                <h2 class="success">✅ Author deleted successfully!</h2>
+            {% elif auth_deleted == False %}
+                <h2 class="error">❌ Failed to delete author!</h2>
+            {% endif %}
+
+            <div class="book-grid">
+                {% for book in books %}
+                <div class="book-card">
+                    <h3>
+                  <a href="/book/{{ book.id }}" class="book-link">{{ book.title }} </a><a href="/author/{{ book.author_id }}" class="author-link"><span>by {{ book.name }}</span></a></h3>
+                    <form action="/author/{{ book.author_id }}/delete" method="POST">
+                        <button class="delete-btn" title="Delete Author" value="Delete">🗑Delete Author</button>
+                    </form>
+                    <p>📅 Year: {{ book.publication_year }}</p>
+                    {% if book.isbn %}
+                      <a href="https://openlibrary.org/isbn/{{ book.isbn }}" target="_blank">
+                        <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="Book Cover">
+                      </a>
+                    {% endif %}
+                    <form action="/book/{{ book.id }}/delete" method="POST">
+                        <button class="delete-btn">🗑 Delete Book</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>

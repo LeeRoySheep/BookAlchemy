@@ -1,0 +1,156 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #111111;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Header */
+header {
+    background: #34191e;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+main label{
+    margin: 0 auto;
+    color: #C1D1B1;
+    padding: 20px;
+}
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: #64491e;
+    border-radius: 5px;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+.nav-links li {
+    margin: 0 15px;
+}
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+.nav-links a:hover {
+    color: #f39c12;
+}
+
+/* Forms */
+.actions {
+    display: flex;
+    gap: 15px;
+}
+form {
+    display: inline-block;
+}
+input, select {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+input[type="submit"], .delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+input[type="submit"]:hover, .delete-btn:hover {
+    background: #c0392b;
+}
+
+/* Books Section */
+.books {
+    padding: 20px;
+}
+
+/* Book Grid */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+/* Book Cards */
+.book-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+.book-card:hover {
+    transform: scale(1.05);
+}
+.book-card h3 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+.book-card h3 span {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+.author-link span:hover {
+    color: black;
+    transition: 0.4s;
+}
+.book-card img {
+    width: 100px;
+    margin: 10px auto;
+    display: block;
+}
+.book-card p {
+    font-size: 0.9rem;
+}
+.book-link:hover {
+    color: #f39c12;
+    transition: 0.2s;
+}
+.author-link:hover {
+    color: black;
+    transition: 0.2s;
+}
+
+/* Error Messages */
+.error {
+    color: #e74c3c;
+}
+.success {
+    color: #2ecc71;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        text-align: center;
+    }
+    .actions {
+        flex-direction: column;
+    }
+    .book-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 40px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #343a40;
+        }
+        .details {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+        .cover {
+            margin: 20px 0;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-back {
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📖 {{ book.title }}</h1>
+        <p class="details">✍ Written by: <strong>{{ book.name }}</strong></p>
+        <p class="details">🗓 Published: {{ book.publication_year }}</p>
+        <p class="details">📚 ISBN: {{ book.isbn if book.isbn else "N/A" }}</p>
+
+        {% if book.isbn %}
+          <a href="https://openlibrary.org/isbn/{{ book.isbn }}" target="_blank">
+            <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" class="cover" alt="Book Cover">
+          </a><br><br>
+        {% endif %}
+
+        <a href="/" class="btn btn-secondary btn-back">⬅ Back to Home</a>
+    </div>
+
+</body>
+</html>

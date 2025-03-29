@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Flask, jsonify,render_template, request
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 
 
 from data_models import db, Author, Book
@@ -13,6 +13,41 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data/library.sqlite"
 
 # Connect Flask to Database
 db.init_app(app)
+
+@app.route("/", methods=["GET","POST"])
+def home():
+    """
+    Route to home page with POST to sort the books by title, author or year
+    :return:
+    """
+    if request.method == "POST":
+        sort_by = request.form.get("options")
+        if sort_by == "title":
+            sort_by = getattr(Book, 'title',None)
+        elif sort_by == "author":
+            sort_by = getattr(Author, 'name',None)
+        elif sort_by == "year":
+            sort_by = getattr(Book, 'publication_year',None)
+        descending = request.form.get("descending")
+        if descending:
+            books = db.session.query(Book.id,Book.isbn,Book.title,
+                                     Author.name, Book.author_id,
+                                     Book.publication_year).join(Author) \
+                                        .order_by(desc(sort_by)).all()
+        else:
+            books = db.session.query(Book.id,Book.isbn,Book.title,
+                                     Author.name, Book.author_id,
+                                     Book.publication_year).join(Author) \
+                                        .order_by(sort_by).all()
+            print(books)
+        return render_template("home.html", books=books)
+    else:
+        books = db.session.query(Book.id,Book.isbn,Book.title, Author.name,
+                                 Book.author_id,Book.publication_year) \
+                                    .join(Author).all()
+
+        return render_template("home.html", books=books)
+
 
 @app.route("/add_author", methods=["GET", "POST"])
 def add_author():
@@ -57,6 +92,10 @@ def add_author():
 # Add Book Route ---------------------------------------------------
 @app.route("/add_book", methods=["GET", "POST"])
 def add_book():
+    """
+    Route to add book with POST or search book/s with GET
+    :return:
+    """
     if request.method == "GET":
         title = request.args.get("title", "")
         year = request.args.get("year", "")
@@ -113,6 +152,104 @@ def add_book():
         except Exception as e: # For Debugging and Testing catch all Exceptions
             print(e)
             return render_template("add_book.html", success=False)
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    """
+    Route to search books with POST and any search term containing title, author or year
+    :return:
+    """
+    title = request.form['search']
+    title = '%' + title + '%'
+    books = db.session.query(Book.id,Book.isbn,Book.title,
+                             Author.name, Book.author_id, Book.publication_year) \
+                                .join(Author).filter(Book.title.contains(title) \
+                                | Author.name.contains(title) | Book.publication_year \
+                                .contains(title)).all()
+    if len(books) == 0:
+        return render_template("home.html", error=True)
+    return render_template("home.html", books=books)
+
+
+@app.route('/book/<int:book_id>/delete', methods=['POST'])
+def delete_book(book_id):
+    """
+    Route to delete book with given id and author if it is the last book
+    :param book_id:
+    :return:
+    """
+    if request.method != "POST":
+        books = db.session.query(Book.id,Book.isbn,Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year).join(Author).all()
+        return render_template("home.html",books=books)
+    book = Book.query.get(book_id)
+    if book:
+        author_id = book.author_id
+        db.session.delete(book)
+        db.session.commit()
+        books_auth=db.session.query(Book.title).filter(Book.author_id == author_id ).all()
+        if len(books_auth) == 0:
+            author = Author.query.get(author_id)
+            db.session.delete(author)
+            db.session.commit()
+        books = db.session.query(Book.id,Book.isbn,Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year).join(Author).all()
+        return render_template('home.html',books=books,deleted=True)
+    else:
+        books = db.session.query(Book.id,Book.isbn,Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year).join(Author).all()
+        return render_template('home.html',books=books,deleted=False)
+
+
+@app.route('/author/<int:author_id>/delete', methods=['POST'])
+def delete_author(author_id):
+    """
+    Route to delete author with given id
+    :param author_id:
+    :return:
+    """
+    author = Author.query.get(author_id)
+    if author:
+        db.session.delete(author)
+        db.session.commit()
+        books = db.session.query(Book.id,Book.isbn,Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year).join(Author).all()
+        return render_template('home.html',books=books,auth_deleted=True)
+    else:
+        books = db.session.query(Book.id,Book.isbn,Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year).join(Author).all()
+        return render_template('home.html',books=books,auth_deleted=False)
+
+
+@app.route('/author/<int:author_id>', methods=['GET'])
+def author(author_id):
+    """
+    Route to display author details with given id
+    :param author_id:
+    :return:
+    """
+    author = Author.query.get(author_id)
+    return render_template("details_author.html", author=author)
+
+
+@app.route('/book/<int:book_id>', methods=['GET'])
+def book(book_id):
+    """
+    Route to display book details with given id
+    :param book_id:
+    :return:
+    """
+    book = db.session.query(Book.isbn,Book.title, \
+                            Book.publication_year,Author.name) \
+                .join(Author).filter(Book.id == book_id).one()._mapping
+    print(book)
+    return render_template("details_book.html", book=book)
 
 app.run(debug=True)
 
