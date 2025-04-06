@@ -12,7 +12,7 @@
   {% if success %}
     <h2>Author added successfully!</h2>
   {% elif success==False %}
-    <h2>Author not added, please try again!</h2>
+    <h2>Author not added! {{ error }}</h2>
   {% endif %}
   <form action="/add_author" method="POST">
       <label for="name">Author Name:</label>

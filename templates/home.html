@@ -66,26 +66,50 @@
                 {% for book in books %}
                 <div class="book-card">
                     <h3>
-                  <a href="/book/{{ book.id }}" class="book-link">{{ book.title }} </a><a href="/author/{{ book.author_id }}" class="author-link"><span>by {{ book.name }}</span></a></h3>
+                  <a href="/book/{{ book.id }}" class="book-link">{{ book.title }} </a>
+                        <a href="/author/{{ book.author_id }}" class="author-link">
+                            <span>by {{ book.name }}</span></a></h3>
+                    {% if auth_confirmation == book.author_id %}
+                        <form action="/author/{{ book.author_id }}/delete"
+                              method="POST">
+                            <p>Are you sure you want to delete all books by
+                                this author and the author itself?
+                            </p>
+                            <button type="submit" name="confirmation" value="yes">Yes</button>
+                            <button type="submit" name="confirmation" value="no">No</button>
+                        </form>
+                    {% else %}
                     <form action="/author/{{ book.author_id }}/delete" method="POST">
-                        <button class="delete-btn" title="Delete Author" value="Delete">🗑Delete Author</button>
+                        <button class="delete-btn" title="Delete Author" value="Delete">
+                            🗑Delete Author</button>
                     </form>
+                    {% endif %}
                     <p>📅 Year: {{ book.publication_year }}</p>
                     {% if book.isbn %}
                       <a href="https://openlibrary.org/isbn/{{ book.isbn }}" target="_blank">
-                        <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg" alt="Book Cover">
+                        <img src="https://covers.openlibrary.org/b/isbn/{{ book.isbn }}-M.jpg"
+                             alt="Book Cover">
                       </a>
                     {% endif %}
                     <footer>
                         <form action="/book/rating/{{ book.id }}" method="POST">
                             <label for="rating">Rating:</label>
-                            <input type="number" id="rating" name="rating" step="0.1" min="0.0" max="10.0" value="{{ book.rating }}" required>
+                            <input type="number" id="rating" name="rating" step="0.1" min="0.0"
+                                   max="10.0" value="{{ book.rating }}" required>
                             <input type="submit" value="Rate">
                         </form>
                     </footer>
-                    <form action="/book/{{ book.id }}/delete" method="POST">
-                        <button class="delete-btn">🗑 Delete Book</button>
-                    </form>
+                    {% if book_confirmation == book.id %}
+                        <form action="/book/{{ book.id }}/delete" method="POST">
+                            <p>Are you sure you want to delete this book?</p>
+                            <button type="submit" name="confirmation" value="yes">Yes</button>
+                            <button type="submit" name="confirmation" value="no">No</button>
+                        </form>
+                    {% else %}
+                        <form action="/book/{{ book.id }}/delete" method="POST">
+                            <button class="delete-btn">🗑 Delete Book</button>
+                        </form>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>

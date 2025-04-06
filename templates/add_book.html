@@ -12,12 +12,12 @@
     {% if success %}
     <h2>Book added successfully!</h2>
   {% elif success==False %}
-    <h2>Book not added, please try again!</h2>
+    <h2>{{ error }}</h2>
   {% endif %}
   <form action="/add_book" method="POST">
 
       <label for="isbn">ISBN:</label>
-      <input type="number" id="isbn" name="isbn" ><br><br>
+      <input type="string" id="isbn" name="isbn" ><br><br>
 
       <label for="title">Book Title:</label>
       <input type="text" id="title" name="title" required><br><br>
@@ -26,7 +26,12 @@
       <input type="number" id="year" name="year" required><br><br>
 
       <label for="author">Author:</label>
-      <input type="text" id="author" name="author" required><br><br>
+        <select id="author" name="author" required>
+            {% for author in authors %}
+            <option value="{{ author.id }}">{{ author.name }}</option>
+            {% endfor %}
+        </select>
+      <br><br>
 
       <label for="rating">Rating:</label>
       <input type="number" id="rating" name="rating" step="0.1" min="0.0" max="10.0"><br><br>

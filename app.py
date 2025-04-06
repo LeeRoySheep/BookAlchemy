@@ -1,7 +1,10 @@
 from datetime import datetime
+
+from click import prompt
 from flask import Flask, jsonify,render_template, request
 
 from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError, OperationalError, PendingRollbackError
 
 import ai_request
 from data_models import db, Author, Book
@@ -77,7 +80,10 @@ def add_author():
             return render_template("add_author.html")
     ### POST ---------------------------------------------------------------
     elif request.method == "POST":
-        name = request.form["name"]
+        if not request.form["name"].strip() or not request.form["birthdate"]:
+            return render_template("add_author.html", success=False,
+                                   error="Please enter a name and birthdate!"), 401
+        name = request.form["name"].strip()
         birthdate = datetime.strptime(request.form["birthdate"], "%Y-%m-%d")
         if request.form["date_of_death"]:
             date_of_death = datetime.strptime(request.form["date_of_death"], "%Y-%m-%d")
@@ -89,8 +95,8 @@ def add_author():
             db.session.commit()
             return render_template("add_author.html", success=True)
         except Exception as e: # For Debugging and Testing catch all Exceptions
-            print(e)
-            return render_template("add_author.html", success=False)
+            print(e.__class__())
+            return render_template("add_author.html", success=False),401
 
 # Add Book Route ---------------------------------------------------
 @app.route("/add_book", methods=["GET", "POST"])
@@ -150,26 +156,45 @@ def add_book():
                 output.append(book)
             return jsonify(output), 200
         else:
-            return render_template("add_book.html")
+            authors = db.session.query(Author).all()
+            return render_template("add_book.html", authors=authors)
     ### POST ---------------------------------------------------------------
     elif request.method == "POST":
         title = request.form["title"]
         year = request.form["year"]
         isbn = request.form["isbn"] if request.form["isbn"] else None
-        author = request.form["author"]
+        author_id = request.form["author"]
         rating = request.form["rating"]
         try:
-            author_id = db.session.query(Author.id) \
-                .filter(Author.name.contains('%' + author + '%')) \
-                .one()[0]
             book = Book(title=title, publication_year=year,
                         isbn=isbn, author_id=author_id , rating=rating)
             db.session.add(book)
             db.session.commit()
-            return render_template("add_book.html", success=True)
+            authors = db.session.query(Author).all()
+            return render_template("add_book.html"
+                                   , success=True, authors=authors)
+        except IntegrityError:
+            db.session.rollback()
+            authors = db.session.query(Author).all()
+            return render_template("add_book.html"
+                                   , success=False, authors=authors
+                                   , error="Entry already exists, check ISBN and/or whole book to"
+                                           "assure uniqueness!"
+                                           ""),401
+        except PendingRollbackError:
+            db.session.rollback()
+            authors = db.session.query(Author).all()
+            return render_template("add_book.html"
+                                   , success=False, authors=authors
+                                   , error="Could not add book to database"
+                                          ""),401
         except Exception as e: # For Debugging and Testing catch all Exceptions
-            print(e)
-            return render_template("add_book.html", success=False)
+            db.session.rollback()
+            authors = db.session.query(Author).all()
+            return render_template("add_book.html"
+                                   , success=False, error="Something went wrong:" ,
+                                   authors=authors),401
+
 
 # Bonus 5 add recommendation route----------------------------------
 @app.route('/add_recommendation', methods=['POST'])
@@ -239,10 +264,13 @@ def delete_book(book_id):
     :param book_id:
     :return:
     """
-    if request.method != "POST":
-        books = db.session.query(Book.id,Book.isbn,Book.title,
-                                     Author.name, Book.author_id,
-                                     Book.publication_year, Book.rating).join(Author).all()
+    if request.method != "POST" or request.form.get("confirmation","") != "yes":
+        if request.method == "POST" and request.form.get("confirmation","") != "no":
+            book = [Book.query.get(book_id)]
+            return render_template("home.html",books=book,book_confirmation=book_id)
+        books = db.session.query(Book.id, Book.isbn, Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year, Book.rating).join(Author).all()
         return render_template("home.html",books=books)
     book = Book.query.get(book_id)
     if book:
@@ -272,6 +300,15 @@ def delete_author(author_id):
     :param author_id:
     :return:
     """
+    if request.method != "POST" or request.form.get("confirmation","") != "yes":
+
+        if request.method == "POST" and request.form.get("confirmation","") != "no":
+            books = db.session.query(Book).filter(Book.author_id == author_id).all()
+            return render_template("home.html",books=books,auth_confirmation=author_id)
+        books = db.session.query(Book.id, Book.isbn, Book.title,
+                                 Author.name, Book.author_id,
+                                 Book.publication_year, Book.rating).join(Author).all()
+        return render_template("home.html",books=books)
     author = Author.query.get(author_id)
     if author:
         db.session.delete(author)

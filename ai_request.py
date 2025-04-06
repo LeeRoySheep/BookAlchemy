@@ -28,7 +28,9 @@ def ai_request(data_string):
               "year": "some year",
               "isbn": "some isbn with only numbers please",
               "birthday": "author's birthday" as python datetime object with format "YYYY-MM-DD",
-              "died": "author's deathday" as pythondatetime object withformat "YYYY-MM-DD" or Null if still alive},
+              "died": "author's deathday" as pythondatetime object \
+              withformat "YYYY-MM-DD" or 
+              Null if still alive},
         "reasoning": "your reasoning text"} 
         """
     )
