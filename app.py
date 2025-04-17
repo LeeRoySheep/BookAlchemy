@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from click import prompt
 from flask import Flask, jsonify,render_template, request
 
 from sqlalchemy import desc
-from sqlalchemy.exc import IntegrityError, OperationalError, PendingRollbackError
+from sqlalchemy.exc import IntegrityError, PendingRollbackError
 
 import ai_request
 from data_models import db, Author, Book
